@@ -38,23 +38,24 @@
   </div>
 
   <script>
-    // Haal API key op uit de URL
+    // Haal de API key en Drive ID's op uit de URL
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get('key');
+    const modelsParam = urlParams.get('models');
 
-    // Je lijst van Drive IDs in de juiste volgorde (modelstates)
-    const driveIDs = [
-      'DRIVE_ID_1',
-      'DRIVE_ID_2',
-      'DRIVE_ID_3',
-      // voeg hier meer Drive IDs toe
-    ];
+    // Als er Drive ID's in de URL staan, splits ze dan op in een array
+    const driveIDs = modelsParam ? modelsParam.split(',') : [];
 
     let currentIndex = 0;
 
     function updateViewer() {
       if (!apiKey) {
         alert("Geen API key gevonden in de URL.");
+        return;
+      }
+
+      if (driveIDs.length === 0) {
+        alert("Geen Drive ID's gevonden in de URL.");
         return;
       }
 
