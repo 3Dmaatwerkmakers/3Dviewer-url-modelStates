@@ -17,6 +17,13 @@
       height: 500px;
       background-color: #f0f0f0;
     }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
     button {
       margin: 10px;
       padding: 10px 20px;
@@ -40,10 +47,11 @@
     shadow-intensity="1">
   </model-viewer>
 
-  <div>
+  <div class="button-container">
     <button onclick="previousModel()">⬅ Vorige</button>
     <button onclick="resetModel()">🔄 Reset</button>
     <button onclick="nextModel()">Volgende ➡</button>
+    <button onclick="showAR()">📱 Toon in AR</button>
   </div>
 
   <script>
@@ -86,6 +94,15 @@
     function resetModel() {
       currentIndex = 0;
       updateViewer();
+    }
+
+    function showAR() {
+      const viewer = document.getElementById('viewer');
+      if (viewer.canActivateAR) {
+        viewer.activateAR(); // Activeert de AR-modus
+      } else {
+        alert("AR wordt niet ondersteund op dit apparaat of in deze browser.");
+      }
     }
 
     // Initialiseer bij laden van pagina
