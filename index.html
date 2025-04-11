@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-  <h1>3D viewer - model states</h1>
+  <h1>Interactieve 3D Viewer met stappen</h1>
 
   <model-viewer id="viewer" alt="3D model" auto-rotate camera-controls ar ar-modes="webxr scene-viewer quick-look">
   </model-viewer>
@@ -60,7 +60,7 @@
       }
 
       const driveId = driveIDs[currentIndex];
-      const modelUrl = `https://www.googleapis.com/drive/v3/files/${driveId}?alt=media&key=${apiKey}`;
+      const modelUrl = https://www.googleapis.com/drive/v3/files/${driveId}?alt=media&key=${apiKey};
       document.getElementById('viewer').src = modelUrl;
     }
 
@@ -83,7 +83,7 @@
     if (apiKey && driveIDs.length > 0) {
       updateViewer();
     } else {
-      document.body.innerHTML += `<p style="color:red;">❗ Geen API key of modelgegevens gevonden.</p>`;
+      document.body.innerHTML += <p style="color:red;">❗ Geen API key of modelgegevens gevonden.</p>;
     }
   </script>
 </body>
