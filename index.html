@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Viewer</title>
+  <title>3D Viewer met stappen</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     body {
@@ -18,64 +18,72 @@
       background-color: #f0f0f0;
     }
     button {
-      margin: 20px;
-      padding: 10px;
+      margin: 10px;
+      padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>Interactieve 3D Viewer - mdel states</h1>
+  <h1>Interactieve 3D Viewer met stappen</h1>
+
   <model-viewer id="viewer" alt="3D model" auto-rotate camera-controls ar ar-modes="webxr scene-viewer quick-look">
   </model-viewer>
 
+  <div>
+    <button onclick="previousModel()">⬅ Vorige</button>
+    <button onclick="resetModel()">🔄 Reset</button>
+    <button onclick="nextModel()">Volgende ➡</button>
+  </div>
+
   <script>
-    // Haal de parameters uit de URL
+    // Haal API key op uit de URL
     const urlParams = new URLSearchParams(window.location.search);
-    const modelId = urlParams.get('model');
-    const state1 = urlParams.get('state1');
-    const state2 = urlParams.get('state2');
-    const apiKey = urlParams.get('key');  
+    const apiKey = urlParams.get('key');
 
-    // Controleer of de vereiste parameters aanwezig zijn
-    if (!modelId || !state1 || !state2 || !apiKey) {
-      document.body.innerHTML += `<p style="color:red;">❗ Geen 'model', 'state1', 'state2', of 'key' parameter gevonden in de URL. Controleer de URL-parameters!</p>`;
-      return;
+    // Je lijst van Drive IDs in de juiste volgorde (modelstates)
+    const driveIDs = [
+      'DRIVE_ID_1',
+      'DRIVE_ID_2',
+      'DRIVE_ID_3',
+      // voeg hier meer Drive IDs toe
+    ];
+
+    let currentIndex = 0;
+
+    function updateViewer() {
+      if (!apiKey) {
+        alert("Geen API key gevonden in de URL.");
+        return;
+      }
+
+      const driveId = driveIDs[currentIndex];
+      const modelUrl = `https://www.googleapis.com/drive/v3/files/${driveId}?alt=media&key=${apiKey}`;
+      document.getElementById('viewer').src = modelUrl;
     }
 
-    // Laad het basis model
-    const modelUrl = `https://www.googleapis.com/drive/v3/files/${modelId}?alt=media&key=${apiKey}`;
-    const viewer = document.getElementById('viewer');
-    viewer.src = modelUrl;
-
-    // Definieer de verschillende model states
-    const states = [state1, state2];
-    let currentStateIndex = 0;
-
-    // Functie om de volgende model state te laden
-    function loadNextState() {
-      currentStateIndex = (currentStateIndex + 1) % states.length;
-      const stateUrl = `https://www.googleapis.com/drive/v3/files/${states[currentStateIndex]}?alt=media&key=${apiKey}`;
-      viewer.src = stateUrl;
+    function nextModel() {
+      currentIndex = (currentIndex + 1) % driveIDs.length;
+      updateViewer();
     }
 
-    // Functie om terug te keren naar het originele model
+    function previousModel() {
+      currentIndex = (currentIndex - 1 + driveIDs.length) % driveIDs.length;
+      updateViewer();
+    }
+
     function resetModel() {
-      viewer.src = modelUrl;
+      currentIndex = 0;
+      updateViewer();
     }
 
-    // Voeg knoppen toe voor navigatie
-    const buttonNext = document.createElement('button');
-    buttonNext.innerHTML = 'Volgende Model State';
-    buttonNext.onclick = loadNextState;
-    document.body.appendChild(buttonNext);
-
-    const buttonReset = document.createElement('button');
-    buttonReset.innerHTML = 'Reset Model';
-    buttonReset.onclick = resetModel;
-    document.body.appendChild(buttonReset);
-
+    // Initialiseer bij laden van pagina
+    if (apiKey && driveIDs.length > 0) {
+      updateViewer();
+    } else {
+      document.body.innerHTML += `<p style="color:red;">❗ Geen API key of modelgegevens gevonden.</p>`;
+    }
   </script>
 </body>
 </html>
