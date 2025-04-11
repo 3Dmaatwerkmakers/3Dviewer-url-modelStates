@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Viewer- model states</title>
+  <title>3D Viewer</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     body {
@@ -17,83 +17,45 @@
       height: 500px;
       background-color: #f0f0f0;
     }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
-  <h1>Interactieve 3D Viewer met verschillende modellen en states</h1>
-
-<model-viewer id="viewer" 
-              alt="3D model" 
-              auto-rotate 
-              camera-controls 
-              ar 
-              ar-modes="webxr scene-viewer quick-look" 
-              exposure="0.5" 
-              shadow-intensity="0.5">
-</model-viewer>
-
-  <div>
-    <button onclick="previousState()">⬅ Vorige Staat</button>
-    <button onclick="resetModel()">🔄 Reset Model</button>
-    <button onclick="nextState()">Volgende Staat ➡</button>
-  </div>
+  <h1>Interactieve 3D Viewer</h1>
+  <model-viewer id="viewer" alt="3D model" auto-rotate camera-controls ar ar-modes="webxr scene-viewer quick-look">
+  </model-viewer>
 
   <script>
-    // Haal de model keuze, states, Drive-ID en API-sleutel uit de URL
     const urlParams = new URLSearchParams(window.location.search);
-    const modelName = urlParams.get('model');  // Dit is nu niet meer strikt nodig, maar kan eventueel gebruikt worden
-    const apiKey = urlParams.get('key');
-    const driveId = urlParams.get('drive');
-    const states = urlParams.get('states') ? urlParams.get('states').split(',') : [];
+    const modelId = urlParams.get('model');
+    const state1 = urlParams.get('state1');
+    const state2 = urlParams.get('state2');
+    const apiKey = urlParams.get('key');  
 
-    if (!apiKey || !driveId || states.length === 0) {
-      alert("❗ Geen model, states, Drive-ID of API-sleutel gevonden in de URL.");
+    if (!modelId || !state1 || !state2 || !apiKey) {
+      document.body.innerHTML += `<p style="color:red;">❗ Geen 'model', 'state1', 'state2', of 'key' parameter gevonden in de URL. Controleer de URL-parameters!</p>`;
+      return; // Stop further execution
     }
 
+    // Construct the model URL from the API and model ID
+    const modelUrl = `https://www.googleapis.com/drive/v3/files/${modelId}?alt=media&key=${apiKey}`;
+    document.getElementById('viewer').src = modelUrl;
+
+    // Optional: Handle the model states logic
+    const states = [state1, state2];
     let currentStateIndex = 0;
-
-    // Functie om de viewer bij te werken
-    function updateViewer() {
-      if (!states[currentStateIndex] || !apiKey || !driveId) {
-        alert("❗ Geen geldige parameters.");
-        return;
-      }
-
-      const stateId = states[currentStateIndex];
-      const modelUrl = `https://www.googleapis.com/drive/v3/files/${stateId}?alt=media&key=${apiKey}`;
-      document.getElementById('viewer').src = modelUrl;
-    }
-
-    // Functie om naar de volgende model state te gaan
-    function nextState() {
+    
+    // Function to load the next state
+    function loadNextState() {
       currentStateIndex = (currentStateIndex + 1) % states.length;
-      updateViewer();
+      const stateUrl = `https://www.googleapis.com/drive/v3/files/${states[currentStateIndex]}?alt=media&key=${apiKey}`;
+      document.getElementById('viewer').src = stateUrl;
     }
 
-    // Functie om naar de vorige model state te gaan
-    function previousState() {
-      currentStateIndex = (currentStateIndex - 1 + states.length) % states.length;
-      updateViewer();
-    }
-
-    // Functie om het model en de state te resetten
-    function resetModel() {
-      currentStateIndex = 0;
-      updateViewer();
-    }
-
-    // Initialiseer de viewer wanneer de pagina is geladen
-    window.onload = function() {
-      if (apiKey && driveId && states.length > 0) {
-        updateViewer();  // Laad de eerste state
-      }
-    };
+    // Add button to switch between model states
+    const button = document.createElement('button');
+    button.innerHTML = 'Volgende Model State';
+    button.onclick = loadNextState;
+    document.body.appendChild(button);
   </script>
 </body>
 </html>
