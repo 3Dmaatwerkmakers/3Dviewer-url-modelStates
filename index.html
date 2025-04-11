@@ -1,1 +1,90 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Viewer met stappen</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    model-viewer {
+      width: 100%;
+      height: 500px;
+      background-color: #f0f0f0;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Interactieve 3D Viewer met stappen</h1>
+
+  <model-viewer id="viewer" alt="3D model" auto-rotate camera-controls ar ar-modes="webxr scene-viewer quick-look">
+  </model-viewer>
+
+  <div>
+    <button onclick="previousModel()">⬅ Vorige</button>
+    <button onclick="resetModel()">🔄 Reset</button>
+    <button onclick="nextModel()">Volgende ➡</button>
+  </div>
+
+  <script>
+    // Haal API key op uit de URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKey = urlParams.get('key');
+
+    // Je lijst van Drive IDs in de juiste volgorde (modelstates)
+    const driveIDs = [
+      'DRIVE_ID_1',
+      'DRIVE_ID_2',
+      'DRIVE_ID_3',
+      // voeg hier meer Drive IDs toe
+    ];
+
+    let currentIndex = 0;
+
+    function updateViewer() {
+      if (!apiKey) {
+        alert("Geen API key gevonden in de URL.");
+        return;
+      }
+
+      const driveId = driveIDs[currentIndex];
+      const modelUrl = `https://www.googleapis.com/drive/v3/files/${driveId}?alt=media&key=${apiKey}`;
+      document.getElementById('viewer').src = modelUrl;
+    }
+
+    function nextModel() {
+      currentIndex = (currentIndex + 1) % driveIDs.length;
+      updateViewer();
+    }
+
+    function previousModel() {
+      currentIndex = (currentIndex - 1 + driveIDs.length) % driveIDs.length;
+      updateViewer();
+    }
+
+    function resetModel() {
+      currentIndex = 0;
+      updateViewer();
+    }
+
+    // Initialiseer bij laden van pagina
+    if (apiKey && driveIDs.length > 0) {
+      updateViewer();
+    } else {
+      document.body.innerHTML += `<p style="color:red;">❗ Geen API key of modelgegevens gevonden.</p>`;
+    }
+  </script>
+</body>
+</html>
