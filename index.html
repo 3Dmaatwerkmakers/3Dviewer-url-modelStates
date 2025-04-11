@@ -17,6 +17,12 @@
       height: 500px;
       background-color: #f0f0f0;
     }
+    button {
+      margin: 20px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -25,37 +31,51 @@
   </model-viewer>
 
   <script>
+    // Haal de parameters uit de URL
     const urlParams = new URLSearchParams(window.location.search);
     const modelId = urlParams.get('model');
     const state1 = urlParams.get('state1');
     const state2 = urlParams.get('state2');
     const apiKey = urlParams.get('key');  
 
+    // Controleer of de vereiste parameters aanwezig zijn
     if (!modelId || !state1 || !state2 || !apiKey) {
       document.body.innerHTML += `<p style="color:red;">❗ Geen 'model', 'state1', 'state2', of 'key' parameter gevonden in de URL. Controleer de URL-parameters!</p>`;
-      return; // Stop further execution
+      return;
     }
 
-    // Construct the model URL from the API and model ID
+    // Laad het basis model
     const modelUrl = `https://www.googleapis.com/drive/v3/files/${modelId}?alt=media&key=${apiKey}`;
-    document.getElementById('viewer').src = modelUrl;
+    const viewer = document.getElementById('viewer');
+    viewer.src = modelUrl;
 
-    // Optional: Handle the model states logic
+    // Definieer de verschillende model states
     const states = [state1, state2];
     let currentStateIndex = 0;
-    
-    // Function to load the next state
+
+    // Functie om de volgende model state te laden
     function loadNextState() {
       currentStateIndex = (currentStateIndex + 1) % states.length;
       const stateUrl = `https://www.googleapis.com/drive/v3/files/${states[currentStateIndex]}?alt=media&key=${apiKey}`;
-      document.getElementById('viewer').src = stateUrl;
+      viewer.src = stateUrl;
     }
 
-    // Add button to switch between model states
-    const button = document.createElement('button');
-    button.innerHTML = 'Volgende Model State';
-    button.onclick = loadNextState;
-    document.body.appendChild(button);
+    // Functie om terug te keren naar het originele model
+    function resetModel() {
+      viewer.src = modelUrl;
+    }
+
+    // Voeg knoppen toe voor navigatie
+    const buttonNext = document.createElement('button');
+    buttonNext.innerHTML = 'Volgende Model State';
+    buttonNext.onclick = loadNextState;
+    document.body.appendChild(buttonNext);
+
+    const buttonReset = document.createElement('button');
+    buttonReset.innerHTML = 'Reset Model';
+    buttonReset.onclick = resetModel;
+    document.body.appendChild(buttonReset);
+
   </script>
 </body>
 </html>
