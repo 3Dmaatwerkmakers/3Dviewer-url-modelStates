@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Viewer met verschillende model states</title>
+  <title>3D Viewer met verschillende modellen en model states</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     body {
@@ -40,12 +40,12 @@
   <script>
     // Haal de model keuze, states, Drive-ID en API-sleutel uit de URL
     const urlParams = new URLSearchParams(window.location.search);
-    const modelName = urlParams.get('model');
+    const modelName = urlParams.get('model');  // Dit is nu niet meer strikt nodig, maar kan eventueel gebruikt worden
     const apiKey = urlParams.get('key');
     const driveId = urlParams.get('drive');
     const states = urlParams.get('states') ? urlParams.get('states').split(',') : [];
 
-    if (!modelName || !apiKey || !driveId || states.length === 0) {
+    if (!apiKey || !driveId || states.length === 0) {
       alert("❗ Geen model, states, Drive-ID of API-sleutel gevonden in de URL.");
     }
 
@@ -83,7 +83,7 @@
 
     // Initialiseer de viewer wanneer de pagina is geladen
     window.onload = function() {
-      if (modelName && apiKey && driveId && states.length > 0) {
+      if (apiKey && driveId && states.length > 0) {
         updateViewer();  // Laad de eerste state
       }
     };
